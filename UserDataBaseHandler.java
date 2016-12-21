@@ -1,5 +1,8 @@
 package database;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fragments.HomeScreenFragment;
 import model.UserReg;
 import model.UserTask;
@@ -285,31 +288,49 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 		
 		 Log.d(dasId,"in fetchAllRecords");
 		SQLiteDatabase database=this.getReadableDatabase(); 
-		 String sql="Select "+ cTaskId + " as _id " + "," + cTaskName + "," + cDescription + "," + cStartDate + "," + cAssignedBy + "," + cStatus +  " from " + mTaskTable +  " where DAS_ID = +  '"+dasId+"' ";
+		 String sql="Select rowid _id, "+ cTaskName + "," + cDescription + "," + cStartDate + "," + cAssignedBy + "," + cStatus +  " from " + mTaskTable +  " where DAS_ID = +  '"+dasId+"' ";
 		 c=database.rawQuery(sql,null);
+		 
+		 //List<String> arraylist = new ArrayList<String>();
+		 
+		 
 		 
 		 if(c!=null)
 		 {
 			 c.moveToFirst();
-			 while(c.moveToNext())
+			
+			 do
 			 {
-				 int taskid=c.getInt(0);
+				  int taskid=c.getInt(0);
 				 String taskname=c.getString(1);
 				 String desc=c.getString(2);
 				 String startdate=c.getString(3);
 				 String assignedby=c.getString(4);
 				 String status=c.getString(5);
 				 
-				 String id=Integer.toString(taskid);
-				 Log.d(id,"taskid");
-				 Log.d(taskname,"task name");
-				 Log.d(desc,"description");
-				 Log.d(assignedby,"assign by");
-				 Log.d(status,"status");
+			/*	 arraylist.add(taskname);
+				 arraylist.add(desc);
+				 arraylist.add(startdate);
+				 arraylist.add(assignedby);
+				 arraylist.add(status);
+			*/	 
 				 
-			 }
+				 
+				 Log.d(Integer.toString(taskid),"taskid"+ Integer.toString(taskid));
+				 Log.d(taskname,"task name "+taskname );
+				 Log.d(desc,"description"+desc);
+				 Log.d(assignedby,"assign by"+assignedby);
+				 Log.d(status,"status"+status);
+				 
+				 
+				 
+			 }while(c.moveToNext());
+			 
+			 
+			 
 		 }
 		 
+		 c.moveToFirst();
 		 return c;
 		 
 	}

@@ -1,5 +1,7 @@
 package fragments;
 
+import java.util.ArrayList;
+
 import com.example.drawerpractice1.R;
 
 import database.UserDataBaseHandler;
@@ -7,10 +9,12 @@ import database.UserDataBaseHandler;
 import android.app.Fragment;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.os.Bundle;
 
 
 import android.webkit.WebView.FindListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -24,9 +28,18 @@ public class HomeScreenFragment extends Fragment
 {
 	private UserDataBaseHandler db;
 	SimpleCursorAdapter cusoradapter;
-	String dasId,hi;
+	String dasId,hi="hiiiiii";
     Cursor c;
     ListView listview;
+    
+    String taskname[];
+    String assignedby[];
+    String descriptition[];
+    String startdate[];
+    String status[];
+    
+   
+    int [] to= new int[]{R.id.textTaskName,R.id.textDescription,R.id.textduration,R.id.textAssignedBy,R.id.textStatus};
     
 	
 	@Override
@@ -36,19 +49,50 @@ public class HomeScreenFragment extends Fragment
 		/*Context context=getActivity();
 		UserDataBaseHandler db=new UserDataBaseHandler(context);*/
 		
+		
+		
 		View view=inflater.inflate(R.layout.homescreenfragment,container,false);
 		
 		Context context=getActivity();
 		UserDataBaseHandler db=new UserDataBaseHandler(context);
 			
 		dasId = getArguments().getString("DasId");
-		c=db.fetchAllRecords(dasId);
 		
-		String taskname=c.getString(1);
+		listview=(ListView) view.findViewById(R.id.listView1);
+		/*
+		 ArrayList<String> names = new ArrayList<String>();
+		 
+		 Log.d(hi,"in fragment");
+		 
+		 try 
+		 {
+			 names=(ArrayList<String>) db.fetchAllRecords(dasId);
+			 int listSize = names.size();
+
+			 for (int i = 0; i<listSize; i++){
+			     Log.i("Member name: ", names.get(i));
+			 }
+             
+         }
+		 catch (SQLException e) 
+		 {
+             e.printStackTrace();
+         }
+		 
+		 
+		 listAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_view,R.id.textTaskName,R.id.textDescription,R.id.textduration,R.id.textAssignedBy,R.id.textStatus,names);
+
+         // set the adapter
+         listview.setAdapter(listAdapter);*/
+		
+		 c=db.fetchAllRecords(dasId);
+		
+		 String taskname="hiiii";
 		
 		Log.d(taskname,"task name in adapter");
 		
-		while(c.moveToNext())
+		
+		do
 		{
 		String taskname1=c.getString(0);
 		String desc=c.getString(1);
@@ -61,7 +105,7 @@ public class HomeScreenFragment extends Fragment
 		Log.d(startdate,"date in adapter");
 		Log.d(assignedby,"assign by in adapter");
 		Log.d(status,"status in adapter");
-		}
+		}while(c.moveToNext());
 		
 		 String[] columns = new String[] {UserDataBaseHandler.cTaskName,UserDataBaseHandler.cDescription,UserDataBaseHandler.cStartDate,UserDataBaseHandler.cAssignedBy,UserDataBaseHandler.cStatus};
 		 
@@ -69,7 +113,7 @@ public class HomeScreenFragment extends Fragment
 		 
 		 try
 		 {
-		  cusoradapter=new SimpleCursorAdapter(getActivity(),R.layout.homescreenfragment,c,columns,to);
+		  cusoradapter=new SimpleCursorAdapter(getActivity(),R.layout.list_view,c,columns,to);
 		  
 		  Log.d(hi,"in try");
 		  
@@ -79,7 +123,7 @@ public class HomeScreenFragment extends Fragment
 		 }
 		 catch(Exception E)
 		 {
-			 Log.v("Error",E.getMessage());
+			// Log.v("Error",E.getMessage());
 		 }
 		  
 		
