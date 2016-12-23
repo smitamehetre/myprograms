@@ -1,9 +1,5 @@
 package database;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import fragments.HomeScreenFragment;
 import model.UserReg;
 import model.UserTask;
 import android.content.BroadcastReceiver;
@@ -35,6 +31,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.UserHandle;
 import android.util.Log;
 import android.view.Display;
 import android.view.ViewDebug.ExportedProperty;
@@ -43,34 +40,34 @@ import android.widget.Toast;
 
 public class UserDataBaseHandler extends SQLiteOpenHelper
 {
-	private static int mversion=1;
-	private static String mDatabaseName="AEM";
-	private String mTaskTable="UserTask";
-	private String mRegTable="UserRegistration";
+	public static int mversion=1;
+	public static String mDatabaseName="AEM";
+	public static String mTaskTable="UserTask";
+	public static String mRegTable="UserRegistration";
 
-	private String DAS_ID="DAS_ID";
-	private String USER_NAME="USER_NAME";
-	private String PASSWORD="PASSWORD";
-	private String MOBILE_NO="MOBILE_NO";
-	private String EMAIL_ID="EMAIL_ID";
-	private String DOB="DOB";
-	private String ORG_UNIT="ORG_UNIT";
-	private String BASE_LOCATION="BASE_LOCATION";
-	private String FLAG="FLAG";
+	public static String DAS_ID="DAS_ID";
+	public static String USER_NAME="USER_NAME";
+	public static String PASSWORD="PASSWORD";
+	public static String MOBILE_NO="MOBILE_NO";
+	public static String EMAIL_ID="EMAIL_ID";
+	public static String DOB="DOB";
+	public static String ORG_UNIT="ORG_UNIT";
+	public static String BASE_LOCATION="BASE_LOCATION";
+	public static String FLAG="FLAG";
 
 
-	private String cTaskId="Task_id";
-	private String cDasId="Das_id";
+	public static String cTaskId="Task_id";
+	public static String cDasId="Das_id";
 	public static String cTaskName="Task_name";
 	public static String cAssignedBy="Assigned_by";
-	private String cAssigneeName="Assignee_name";
+	public static String cAssigneeName="Assignee_name";
 	public static String cStartDate="Start_date";
-	private String cEndDate="End_date";
+	public static String cEndDate="End_date";
 	public static String cDescription="Description";
 	public static String cStatus="Status";
-	private String cUserComments="User_comments";
+	public static String cUserComments="User_comments";
 
-	private Cursor c;
+	public static Cursor c;
 	public UserDataBaseHandler(Context context)
 	{
 		super(context, mDatabaseName, null, mversion);
@@ -102,18 +99,7 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 		onCreate(db);
 
 	}
-	/*public void add(EditText textDasId, EditText textUserName,
-			EditText textPassword, EditText textConfirm, EditText textMobile,
-			EditText textEmail)
-	{
-		 SQLiteDatabase database=this.getWritableDatabase();
-
-		 ContentValues values=new ContentValues();
-
-		 //values.put("DAS_ID");
-
-	}
-	 */
+	
 
 	public void add(UserReg userreg) 
 	{
@@ -165,7 +151,8 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 				
 			}
 		}
-
+		 c.close();
+	     database.close();
 		return flag;
 	}
 	public void addTask(UserTask task)
@@ -187,37 +174,16 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 		database.insert(mTaskTable,null, values);
 
 	}
- 
+
 	public int changePassword(UserReg reg,String mdasId) 
 	{
 		SQLiteDatabase database=this.getWritableDatabase();
-		String mobileno = null,emailid = null;
-		int flag=1;
 		
-		/*ContentValues values=new ContentValues();
+		ContentValues values=new ContentValues();
 		
 		values.put(PASSWORD,reg.getmPasword());
 		values.put(MOBILE_NO,reg.getmMobileNo());
-		values.put(EMAIL_ID, reg.getmEmailId());*/
-		
-		String sql="Select " + MOBILE_NO + "," + EMAIL_ID + " from " + mRegTable +  " where DAS_ID = + '"+mdasId+"' ";
-		c=database.rawQuery(sql,null);
-		
-		if(c!=null)
-		{
-			if(c.moveToFirst())
-			{
-				mobileno=c.getString(0);
-		        emailid=c.getString(1);
-				
-				Log.d(mobileno,"in cursor");
-				Log.d(emailid,"in cursor");
-			}
-		}
-		
-		
-		/*String sql="update" + mRegTable + "set" + PASSWORD + "=" + reg.getmPasword() +"," + MOBILE_NO + "=" + reg.getmMobileNo() +","+ EMAIL_ID + "=" +reg.getmEmailId() + "where" + DAS_ID + "=" +reg.getmDasId() ;  
-		database.execSQL(sql);*/
+		values.put(EMAIL_ID, reg.getmEmailId());
 		
 		String dasId=reg.getmDasId();
 		String password=reg.getmPasword();
@@ -229,40 +195,12 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 		Log.d(password,"in changePass");
 		Log.d(mob,"in changePass");
 	    Log.d(email,"in changePass");
-	    
-	    if(mob.equals(mobileno) && email.equals(emailid))
-	    {
-	    	changePasswordFinal(reg,mdasId);
-	    	flag=0;
-	     //return database.update(mRegTable,values,"DAS_ID ="+" '"+mdasId+"' ",null);
-	    }
-	    
-	    return flag;
+	   
+	     database.close();
+		return database.update(mRegTable,values,"DAS_ID ="+" '"+mdasId+"' ",null);
 		
-	    
-	    
-	    
-	}
-
-
-
-	private void changePasswordFinal(UserReg reg, String mdasId) 
-	{
-		SQLiteDatabase database=this.getWritableDatabase();
-		
-		
-		ContentValues values=new ContentValues();
-		
-		values.put(PASSWORD,reg.getmPasword());
-		
-		
-		database.update(mRegTable,values,"DAS_ID ="+" '"+mdasId+"' ",null);
 		
 	}
-
-
-
-	
 	public boolean checkDuplicateDasId(String dasId)
 	{
 	     SQLiteDatabase database=this.getReadableDatabase();
@@ -278,10 +216,62 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 	    	 	flag=false;
 	    	   }
 	     }
-	     
+	     c.close();
+	     database.close();
 	     return flag;
 	     
 		
+	}
+	public String[] getEmailAndMob(String dasId)
+	{
+		SQLiteDatabase database=this.getWritableDatabase();
+		String info[]={"",""};
+		Log.d(dasId,"in 1st if "+ dasId);
+		String sql="select EMAIL_ID,MOBILE_NO from "+ mRegTable +" where DAS_ID='"+dasId +"'";
+		Cursor c1=database.rawQuery(sql,null);
+		while(c1.moveToNext())
+		{
+			//int index=c1.getColumnIndex(MOBI);
+			info[0]=c1.getString(0);
+			info[1]=c1.getString(1);
+			Log.d(dasId,"in while "+ dasId);
+			Log.d(dasId,"in curosr======"+c1.getCount()+" "+c1.getString(0)+" "+c1.getString(1));
+
+		}
+		c1.close();
+		database.close();
+		return info;
+	
+	}
+	public int updateInfo(String strUser,String strDob,String strOU,String strBase,String dasId)
+	{
+		ContentValues values=new ContentValues();
+		values.put("USER_NAME", strUser);
+		values.put("DOB", strDob);
+		values.put("ORG_UNIT", strOU);
+		values.put("BASE_LOCATION", strBase);
+		String[] whereArgs={dasId};
+		SQLiteDatabase database=this.getWritableDatabase();
+    	int id=database.update(mRegTable,values,DAS_ID+"=?",whereArgs);
+    	return id;
+		
+	}
+	public int updateTask(UserTask task,String dasId)
+	{
+		ContentValues values=new ContentValues();
+		values.put(DAS_ID, task.getmDasId());
+		values.put(cTaskName,task.getmTaskName());
+		values.put(cAssignedBy,task.getmAssignBy());
+		values.put(cAssigneeName,task.getmAssignName());
+		values.put(cStartDate,task.getmStartDate());
+		values.put(cEndDate,task.getmEndDate());
+		values.put(cDescription, task.getmDescription());
+		values.put(cStatus,task.getmStatus());
+		values.put(cUserComments,task.getmUserComments());
+		String []whereArgs={dasId};
+		SQLiteDatabase database=this.getWritableDatabase();
+		int id=database.update(mTaskTable, values, DAS_ID+"=?", whereArgs);
+		return id;
 	}
 	public Cursor fetchAllRecords(String dasId) 
 	{
@@ -298,41 +288,35 @@ public class UserDataBaseHandler extends SQLiteOpenHelper
 		 if(c!=null)
 		 {
 			 c.moveToFirst();
-			
-			 do
-			 {
-				  int taskid=c.getInt(0);
-				 String taskname=c.getString(1);
-				 String desc=c.getString(2);
-				 String startdate=c.getString(3);
-				 String assignedby=c.getString(4);
-				 String status=c.getString(5);
-				 
-			/*	 arraylist.add(taskname);
-				 arraylist.add(desc);
-				 arraylist.add(startdate);
-				 arraylist.add(assignedby);
-				 arraylist.add(status);
-			*/	 
-				 
-				 
-				 Log.d(Integer.toString(taskid),"taskid"+ Integer.toString(taskid));
-				 Log.d(taskname,"task name "+taskname );
-				 Log.d(desc,"description"+desc);
-				 Log.d(assignedby,"assign by"+assignedby);
-				 Log.d(status,"status"+status);
-				 
-				 
-				 
-			 }while(c.moveToNext());
-			 
-			 
-			 
 		 }
-		 
-		 c.moveToFirst();
+		
 		 return c;
 		 
+	}
+
+	public boolean checkTaskRecord(String dasId)
+	{
+		boolean flag=true;
+		String hi="hiiiii";
+		SQLiteDatabase database=this.getReadableDatabase(); 
+		
+		String sql="Select * from " +  mTaskTable + " where DAS_ID = +  '"+dasId+"' ";
+		c=database.rawQuery(sql,null);
+		
+		Log.d(hi,"dasId"  +dasId);
+		
+		if(c.getCount()>0)
+		 {
+			 Log.d(hi,"in c!=null" + dasId);
+			 flag=false;
+			 Log.d("In c!=null",Boolean.toString(flag));
+		 }
+		 
+		 
+		
+		
+		
+		return flag;
 	}
 
 
